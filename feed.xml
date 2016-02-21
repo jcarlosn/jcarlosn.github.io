@@ -12,7 +12,7 @@
 &lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://www.torproject.org/&quot;&gt;Tor&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; is a service run by a network of volunteers to allow people to use internet anonymously. Normally tor is used to browse the web
 without being tracked or identified.&lt;/p&gt;
 
-&lt;p&gt;One of the less known features of the tor service is the ability to provide what is known in tor as &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://www.torproject.org/docs/hidden-services.html.en&quot;&gt;hidden services&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.
+&lt;p&gt;One less known feature of the tor service is the ability to provide what is known in tor as &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://www.torproject.org/docs/hidden-services.html.en&quot;&gt;hidden services&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.
 Hidden services are basically servers that provide services through the tor network. When you think about tor the first thing you think of
 is anonymous web browsing. However, for hacktivists and dissidents it is very useful not only to be able to browse the web without being identified,
 but also providing web pages for people in a way that such webpages can not be tracked or shutdown easily.&lt;/p&gt;
@@ -21,22 +21,22 @@ but also providing web pages for people in a way that such webpages can not be t
 &lt;img src=&quot;/assets/media/posts/torlogo.png&quot; /&gt;
 &lt;/div&gt;
 
-&lt;p&gt;In the tor network there are thousands of ‘hidden services’ accessible only for people using the tor network, that provide access to forbidden information about very different topics.
-Those sites have a hidden DNS address with the .onion tld, for example example.onion. This sites ending in .onion can not be tracked or shutdown, and the owner can not be identified.&lt;/p&gt;
+&lt;p&gt;In the tor network there are thousands of ‘hidden services’ accessible only for people using the tor network, providing access to forbidden information about very different topics.
+Those sites have a hidden DNS address with the .onion tld, for example example.onion. Sites ending in .onion can not be easily tracked or shutdown, and the owner can not be easily identified.&lt;/p&gt;
 
 &lt;p&gt;One of the most complex things about setting up a hidden service, is configuring the web server in a way that doesn’t leak information about the real IP address of the server, or the country location etc.
-The more complex the site, the more difficult it becomes to setup a real hidden service that doesn’t leak information in any way.&lt;/p&gt;
+The more complex the site, the more difficult it becomes to setup a real hidden service that doesn’t leak service information in any way.&lt;/p&gt;
 
-&lt;p&gt;During the last years, the FBI has been able to identify and shutdown certain hidden services, using social engineering, information leaks and browser vulnerabilities. The last example is
+&lt;p&gt;During the last years, the F.B.I. has been able to identify and shutdown certain hidden services, using social engineering, information leaks and browser vulnerabilities. The most famous example is
 &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Silk_Road_(marketplace)&quot;&gt;The Silk Road&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;,
 a well known black market hidden inside tor, used for selling drugs and similar stuff.&lt;/p&gt;
 
 &lt;p&gt;Of course, the administrators behind hidden services try its best to not leak any information about the physical location of the server providing the service, or any other information
-that could leak to the identification of the owner of the hidden service.&lt;/p&gt;
+that could lead to the identification of the owner of the hidden service.&lt;/p&gt;
 
 &lt;h3 id=&quot;leaking-the-timezone&quot;&gt;Leaking the timezone&lt;/h3&gt;
 &lt;p&gt;The HTTP protocol allows the client to inform the server about its compression capabilities. If the client and server share support for a specific compression format, the server can decide to compress the http
-response in order to save bandwitch and time. All major web server and browser support compression. The most common formats used for
+response in order to save bandwidth and time. All major web servers and browsers support compression. The most common formats used for
 &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/HTTP_compression&quot;&gt;HTTP compression&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; are &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://www.gzip.org/&quot;&gt;gzip&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/DEFLATE&quot;&gt;DEFLATE&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
 
 &lt;p&gt;Gzip is a compression format that allows relative fast data compression with decent compression ratios.&lt;/p&gt;
@@ -114,7 +114,7 @@ of the webservers leak the remote date when compressing HTTP Responses with gzip
 
 &lt;p&gt;For testing purposes, &lt;strong&gt;instagram.com&lt;/strong&gt;, &lt;strong&gt;reddit.com&lt;/strong&gt; and &lt;strong&gt;bing.com&lt;/strong&gt; leak the remote date in the gzip encoded http response.&lt;/p&gt;
 
-&lt;p&gt;Of course, because of privacy concerns, I’m not going to provide information on wich hidden services are leaking the remote date.&lt;/p&gt;
+&lt;p&gt;Of course, because of privacy concerns, I’m not going to provide information on which hidden services are leaking the remote date.&lt;/p&gt;
 
 &lt;h3 id=&quot;proof-of-concept&quot;&gt;Proof Of Concept&lt;/h3&gt;
 
@@ -139,7 +139,7 @@ user@localhost:~$
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;br /&gt;
-The tool is available here:&lt;/p&gt;
+The Proof of concept is available here:&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://github.com/jcarlosn/gzip-http-time&quot;&gt;https://github.com/jcarlosn/gzip-http-time&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
 

@@ -167,7 +167,7 @@
 <p><strong><em><a href="https://www.torproject.org/">Tor</a></em></strong> is a service run by a network of volunteers to allow people to use internet anonymously. Normally tor is used to browse the web
 without being tracked or identified.</p>
 
-<p>One of the less known features of the tor service is the ability to provide what is known in tor as <strong><em><a href="https://www.torproject.org/docs/hidden-services.html.en">hidden services</a></em></strong>.
+<p>One less known feature of the tor service is the ability to provide what is known in tor as <strong><em><a href="https://www.torproject.org/docs/hidden-services.html.en">hidden services</a></em></strong>.
 Hidden services are basically servers that provide services through the tor network. When you think about tor the first thing you think of
 is anonymous web browsing. However, for hacktivists and dissidents it is very useful not only to be able to browse the web without being identified,
 but also providing web pages for people in a way that such webpages can not be tracked or shutdown easily.</p>
@@ -176,22 +176,22 @@ but also providing web pages for people in a way that such webpages can not be t
 <img src="/assets/media/posts/torlogo.png" />
 </div>
 
-<p>In the tor network there are thousands of ‘hidden services’ accessible only for people using the tor network, that provide access to forbidden information about very different topics.
-Those sites have a hidden DNS address with the .onion tld, for example example.onion. This sites ending in .onion can not be tracked or shutdown, and the owner can not be identified.</p>
+<p>In the tor network there are thousands of ‘hidden services’ accessible only for people using the tor network, providing access to forbidden information about very different topics.
+Those sites have a hidden DNS address with the .onion tld, for example example.onion. Sites ending in .onion can not be easily tracked or shutdown, and the owner can not be easily identified.</p>
 
 <p>One of the most complex things about setting up a hidden service, is configuring the web server in a way that doesn’t leak information about the real IP address of the server, or the country location etc.
-The more complex the site, the more difficult it becomes to setup a real hidden service that doesn’t leak information in any way.</p>
+The more complex the site, the more difficult it becomes to setup a real hidden service that doesn’t leak service information in any way.</p>
 
-<p>During the last years, the FBI has been able to identify and shutdown certain hidden services, using social engineering, information leaks and browser vulnerabilities. The last example is
+<p>During the last years, the F.B.I. has been able to identify and shutdown certain hidden services, using social engineering, information leaks and browser vulnerabilities. The most famous example is
 <strong><em><a href="https://en.wikipedia.org/wiki/Silk_Road_(marketplace)">The Silk Road</a></em></strong>,
 a well known black market hidden inside tor, used for selling drugs and similar stuff.</p>
 
 <p>Of course, the administrators behind hidden services try its best to not leak any information about the physical location of the server providing the service, or any other information
-that could leak to the identification of the owner of the hidden service.</p>
+that could lead to the identification of the owner of the hidden service.</p>
 
 <h3 id="leaking-the-timezone">Leaking the timezone</h3>
 <p>The HTTP protocol allows the client to inform the server about its compression capabilities. If the client and server share support for a specific compression format, the server can decide to compress the http
-response in order to save bandwitch and time. All major web server and browser support compression. The most common formats used for
+response in order to save bandwidth and time. All major web servers and browsers support compression. The most common formats used for
 <strong><em><a href="https://en.wikipedia.org/wiki/HTTP_compression">HTTP compression</a></em></strong> are <strong><em><a href="http://www.gzip.org/">gzip</a></em></strong> and <strong><em><a href="https://en.wikipedia.org/wiki/DEFLATE">DEFLATE</a></em></strong>.</p>
 
 <p>Gzip is a compression format that allows relative fast data compression with decent compression ratios.</p>
@@ -269,7 +269,7 @@ of the webservers leak the remote date when compressing HTTP Responses with gzip
 
 <p>For testing purposes, <strong>instagram.com</strong>, <strong>reddit.com</strong> and <strong>bing.com</strong> leak the remote date in the gzip encoded http response.</p>
 
-<p>Of course, because of privacy concerns, I’m not going to provide information on wich hidden services are leaking the remote date.</p>
+<p>Of course, because of privacy concerns, I’m not going to provide information on which hidden services are leaking the remote date.</p>
 
 <h3 id="proof-of-concept">Proof Of Concept</h3>
 
@@ -294,7 +294,7 @@ user@localhost:~$
 </code></pre>
 
 <p><br />
-The tool is available here:</p>
+The Proof of concept is available here:</p>
 
 <p><strong><em><a href="https://github.com/jcarlosn/gzip-http-time">https://github.com/jcarlosn/gzip-http-time</a></em></strong></p>
 
