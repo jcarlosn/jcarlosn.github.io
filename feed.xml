@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title></title>
+		<description>Personal blog of Jose Carlos Norte, about technology, security, agilism and similar things</description>
+		<link>/</link>
+		<atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
+		
+			<item>
+				<title>HTTP GZIP Compression remote date and time leak</title>
+				<description>&lt;h3 id=&quot;hidden-services-in-tor&quot;&gt;Hidden Services in TOR&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://www.torproject.org/&quot;&gt;Tor&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; is a service run by a network of volunteers to allow people to use internet anonymously. Normally tor is used to browse the web
+without being tracked or identified.&lt;/p&gt;
+
+&lt;p&gt;One of the less known features of the tor service is the ability to provide what is known in tor as &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://www.torproject.org/docs/hidden-services.html.en&quot;&gt;hidden services&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.
+Hidden services are basically servers that provide services through the tor network. When you think about tor the first thing you think of
+is anonymous web browsing. However, for hacktivists and dissidents it is very useful not only to be able to browse the web without being identified,
+but also providing web pages for people in a way that such webpages can not be tracked or shutdown easily.&lt;/p&gt;
+
+&lt;div style=&quot;text-align:center;margin:25px&quot;&gt;
+&lt;img src=&quot;/assets/media/posts/torlogo.png&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In the tor network there are thousands of ‘hidden services’ accessible only for people using the tor network, that provide access to forbidden information about very different topics.
+Those sites have a hidden DNS address with the .onion tld, for example example.onion. This sites ending in .onion can not be tracked or shutdown, and the owner can not be identified.&lt;/p&gt;
+
+&lt;p&gt;One of the most complex things about setting up a hidden service, is configuring the web server in a way that doesn’t leak information about the real IP address of the server, or the country location etc.
+The more complex the site, the more difficult it becomes to setup a real hidden service that doesn’t leak information in any way.&lt;/p&gt;
+
+&lt;p&gt;During the last years, the FBI has been able to identify and shutdown certain hidden services, using social engineering, information leaks and browser vulnerabilities. The last example is
+&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Silk_Road_(marketplace)&quot;&gt;The Silk Road&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;,
+a well known black market hidden inside tor, used for selling drugs and similar stuff.&lt;/p&gt;
+
+&lt;p&gt;Of course, the administrators behind hidden services try its best to not leak any information about the physical location of the server providing the service, or any other information
+that could leak to the identification of the owner of the hidden service.&lt;/p&gt;
+
+&lt;h3 id=&quot;leaking-the-timezone&quot;&gt;Leaking the timezone&lt;/h3&gt;
+&lt;p&gt;The HTTP protocol allows the client to inform the server about its compression capabilities. If the client and server share support for a specific compression format, the server can decide to compress the http
+response in order to save bandwitch and time. All major web server and browser support compression. The most common formats used for
+&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/HTTP_compression&quot;&gt;HTTP compression&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; are &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://www.gzip.org/&quot;&gt;gzip&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/DEFLATE&quot;&gt;DEFLATE&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Gzip is a compression format that allows relative fast data compression with decent compression ratios.&lt;/p&gt;
+
+&lt;p&gt;As a compression format, gzip specifies a data header to be included in the resulting compressed data, this header includes information about the compressed data, the operating system that compressed the data, and
+most importantly: &lt;strong&gt;the date when the data was compressed&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;The header is as follows, as you can see in &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://www.forensicswiki.org/wiki/Gzip&quot;&gt;Foreniscs Wiki&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;:
+&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Offset&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Size&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Value&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  0  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  2  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;          0x1f 0x8b      &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Magic number to idenitfy gzip streams&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  2  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  1  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;                &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Compression method&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  3  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  1  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;                &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Flags&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  4  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  4  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;                &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;&lt;strong&gt;Compression Date&lt;/strong&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  8  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  1  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;                &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Compression flags&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  9  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;  1  &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;                &lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Operating system&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;
+So, if this header is present in any gzip compressed data, we can make a gzip compressed request to any webserver, wait for the gzip compressed response, check if the bytes starts with 0x1f 0x8b, and check for
+the compression date to know the exact date configured at the server that serves the page.&lt;/p&gt;
+
+&lt;div style=&quot;text-align:center;margin:25px&quot;&gt;
+&lt;img src=&quot;/assets/media/posts/timezone.jpg&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;With normal webservers, this is only useful in a very limited scenarios, because the geopraphical position of the server is not hidden in any way, and can be known easily knowing the server IP address, that is not hidden at all.
+However, in a &lt;strong&gt;Hidden Service&lt;/strong&gt;, the information about the server timezone can be very useful to identify the possible countries where the server is running.&lt;/p&gt;
+
+&lt;p&gt;This, of course, &lt;strong&gt;its NOT a TOR fault and its not a bug in the tor protocol&lt;/strong&gt; or anything like that, its just a obscure feature of the gzip format, available in the HTTP Protocol by default in most web servers.&lt;/p&gt;
+
+&lt;p&gt;The good news is that lots of webservers are preconfigured to fill the date field of the gzip header with ‘0’s, maybe because of performance issues, who knows. After some research, I found that around 10%
+of the webservers leak the remote date when compressing HTTP Responses with gzip.&lt;/p&gt;
+
+&lt;p&gt;For testing purposes, &lt;strong&gt;instagram.com&lt;/strong&gt;, &lt;strong&gt;reddit.com&lt;/strong&gt; and &lt;strong&gt;bing.com&lt;/strong&gt; leak the remote date in the gzip encoded http response.&lt;/p&gt;
+
+&lt;p&gt;Of course, because of privacy concerns, I’m not going to provide information on wich hidden services are leaking the remote date.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept&quot;&gt;Proof Of Concept&lt;/h3&gt;
+
+&lt;p&gt;I have developed a little php script that uses curl (command line) to get the remote server date if available in the gzip compressed HTTP Response. It will only work in web server that
+allows for compression of HTTP Responses, and fills the ‘date’ field of the gzip header with the correct date instead of zeroes.&lt;/p&gt;
+
+&lt;p&gt;Examples of use:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;user@localhost:~$ php time.php bing.com
+The server that processed the request on: bing.com has local date set to:
+Sunday 21st of February 2016 01:21:21 PM
+
+user@localhost:~$ php time.php reddit.com
+The server that processed the request on: reddit.com has local date set to:
+Sunday 21st of February 2016 09:21:25 PM
+
+user@localhost:~$ php time.php instagram.com
+The server that processed the request on: instagram.com has local date set to:
+Sunday 21st of February 2016 09:21:30 PM
+
+user@localhost:~$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;
+The tool is available here:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://github.com/jcarlosn/gzip-http-time&quot;&gt;https://github.com/jcarlosn/gzip-http-time&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+</description>
+				<pubDate>Sun, 21 Feb 2016 00:00:00 +0100</pubDate>
+				<link>/security/2016/02/21/date-leak-gzip-tor.html</link>
+				<guid isPermaLink="true">/security/2016/02/21/date-leak-gzip-tor.html</guid>
+			</item>
+		
+	</channel>
+</rss>

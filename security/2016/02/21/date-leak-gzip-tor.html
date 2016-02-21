@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>HTTP GZIP Compression remote date and time leak</title>
+	
+	<meta name="author" content="Jose Carlos Norte">
+
+	<!-- Enable responsive viewport -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+	<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<!-- Le styles -->
+	<link href="/assets/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/assets/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="/assets/resources/syntax/syntax.css" rel="stylesheet">
+	<link href="/assets/css/style.css" rel="stylesheet">
+
+	<!-- Le fav and touch icons -->
+	<!-- Update these with your own images
+	<link rel="shortcut icon" href="images/favicon.ico">
+	<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+	-->
+
+	<link rel="alternate" type="application/rss+xml" title="" href="/feed.xml">
+</head>
+
+<body>
+	<nav class="navbar navbar-default visible-xs" role="navigation">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			
+			<a type="button" class="navbar-toggle nav-link" href="http://github.com/jcarlosn">
+				<i class="fa fa-github"></i>
+			</a>
+			
+			
+			<a type="button" class="navbar-toggle nav-link" href="http://twitter.com/jcarlosnorte">
+				<i class="fa fa-twitter"></i>
+			</a>
+			
+			
+			<a type="button" class="navbar-toggle nav-link" href="mailto:jcarlos.norte@gmail.com">
+				<i class="fa fa-envelope"></i>
+			</a>
+			
+			<a class="navbar-brand" href="/">
+				<img src="http://www.gravatar.com/avatar/726351295ec82e145928582f595aa3aa?s=35" class="img-circle" />
+				
+			</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="/">Home</a></li>
+				<li><a href="/categories.html">Categories</a></li>
+				<li><a href="/tags.html">Tags</a></li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</nav>
+
+	<!-- nav-menu-dropdown -->
+	<div class="btn-group hidden-xs" id="nav-menu">
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			<i class="fa fa-bars"></i>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+			<li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+			<li><a href="/categories.html"><i class="fa fa-folder"></i>Categories</a></li>
+			<li><a href="/tags.html"><i class="fa fa-tags"></i>Tags</a></li>
+			<li class="divider"></li>
+			<li><a href="#"><i class="fa fa-arrow-up"></i>Top of Page</a></li>
+		</ul>
+	</div>
+
+	<div class="col-sm-3 sidebar hidden-xs" style="">
+		<!-- sidebar.html -->
+<header class="sidebar-header" role="banner">
+	<a href="/">
+		<img src="/assets/media/jcarlosn.png" class="img-circle" />
+	</a>
+	<h3 class="title">
+        <a href="/"></a>
+    </h3>
+</header>
+
+
+<div id="bio" class="text-center">
+	Enterpreneur, Thinker, Agilist, Technology enthusiast, Computer programmer, I.T. security expert and FOSS supporter.
+</div>
+
+
+<div id="contact-list" class="text-center">
+	<ul class="list-unstyled list-inline">
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="https://github.com/jcarlosn">
+				<i class="fa fa-github-alt fa-lg"></i>
+			</a>
+		</li>
+		
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="https://twitter.com/jcarlosnorte">
+				<i class="fa fa-twitter fa-lg"></i>
+			</a>
+		</li>
+		
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="mailto:jcarlos.norte@gmail.com">
+				<i class="fa fa-envelope fa-lg"></i>
+			</a>
+		</li>
+		
+	</ul>
+	<ul id="contact-list-secondary" class="list-unstyled list-inline">
+		
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="https://linkedin.com/in/jcarlosn">
+				<i class="fa fa-linkedin fa-lg"></i>
+			</a>
+		</li>
+		
+		<li>
+			<a class="btn btn-default btn-sm" href="/feed.xml">
+				<i class="fa fa-rss fa-lg"></i>
+			</a>
+		</li>
+	</ul>
+</div>
+<!-- sidebar.html end -->
+
+	</div>
+
+	<div class="col-sm-9 col-sm-offset-3">
+		<div class="page-header">
+  <h1>HTTP GZIP Compression remote date and time leak </h1>
+</div>
+	
+<article>
+
+	<div class="col-sm-10">
+	 <span class="post-date">
+	   
+	   February 
+	   21st,
+	     
+	   2016
+	 </span>
+	  <div class="article_body">
+	  <h3 id="hidden-services-in-tor">Hidden Services in TOR</h3>
+<p><strong><em><a href="https://www.torproject.org/">Tor</a></em></strong> is a service run by a network of volunteers to allow people to use internet anonymously. Normally tor is used to browse the web
+without being tracked or identified.</p>
+
+<p>One of the less known features of the tor service is the ability to provide what is known in tor as <strong><em><a href="https://www.torproject.org/docs/hidden-services.html.en">hidden services</a></em></strong>.
+Hidden services are basically servers that provide services through the tor network. When you think about tor the first thing you think of
+is anonymous web browsing. However, for hacktivists and dissidents it is very useful not only to be able to browse the web without being identified,
+but also providing web pages for people in a way that such webpages can not be tracked or shutdown easily.</p>
+
+<div style="text-align:center;margin:25px">
+<img src="/assets/media/posts/torlogo.png" />
+</div>
+
+<p>In the tor network there are thousands of ‘hidden services’ accessible only for people using the tor network, that provide access to forbidden information about very different topics.
+Those sites have a hidden DNS address with the .onion tld, for example example.onion. This sites ending in .onion can not be tracked or shutdown, and the owner can not be identified.</p>
+
+<p>One of the most complex things about setting up a hidden service, is configuring the web server in a way that doesn’t leak information about the real IP address of the server, or the country location etc.
+The more complex the site, the more difficult it becomes to setup a real hidden service that doesn’t leak information in any way.</p>
+
+<p>During the last years, the FBI has been able to identify and shutdown certain hidden services, using social engineering, information leaks and browser vulnerabilities. The last example is
+<strong><em><a href="https://en.wikipedia.org/wiki/Silk_Road_(marketplace)">The Silk Road</a></em></strong>,
+a well known black market hidden inside tor, used for selling drugs and similar stuff.</p>
+
+<p>Of course, the administrators behind hidden services try its best to not leak any information about the physical location of the server providing the service, or any other information
+that could leak to the identification of the owner of the hidden service.</p>
+
+<h3 id="leaking-the-timezone">Leaking the timezone</h3>
+<p>The HTTP protocol allows the client to inform the server about its compression capabilities. If the client and server share support for a specific compression format, the server can decide to compress the http
+response in order to save bandwitch and time. All major web server and browser support compression. The most common formats used for
+<strong><em><a href="https://en.wikipedia.org/wiki/HTTP_compression">HTTP compression</a></em></strong> are <strong><em><a href="http://www.gzip.org/">gzip</a></em></strong> and <strong><em><a href="https://en.wikipedia.org/wiki/DEFLATE">DEFLATE</a></em></strong>.</p>
+
+<p>Gzip is a compression format that allows relative fast data compression with decent compression ratios.</p>
+
+<p>As a compression format, gzip specifies a data header to be included in the resulting compressed data, this header includes information about the compressed data, the operating system that compressed the data, and
+most importantly: <strong>the date when the data was compressed</strong>.</p>
+
+<p>The header is as follows, as you can see in <strong><em><a href="http://www.forensicswiki.org/wiki/Gzip">Foreniscs Wiki</a></em></strong>:
+<br /><br /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Offset</th>
+      <th style="text-align: center">Size</th>
+      <th style="text-align: center">Value</th>
+      <th style="text-align: center">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">  0  </td>
+      <td style="text-align: center">  2  </td>
+      <td style="text-align: center">          0x1f 0x8b      </td>
+      <td style="text-align: center">Magic number to idenitfy gzip streams</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">  2  </td>
+      <td style="text-align: center">  1  </td>
+      <td style="text-align: center">                </td>
+      <td style="text-align: center">Compression method</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">  3  </td>
+      <td style="text-align: center">  1  </td>
+      <td style="text-align: center">                </td>
+      <td style="text-align: center">Flags</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">  4  </td>
+      <td style="text-align: center">  4  </td>
+      <td style="text-align: center">                </td>
+      <td style="text-align: center"><strong>Compression Date</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">  8  </td>
+      <td style="text-align: center">  1  </td>
+      <td style="text-align: center">                </td>
+      <td style="text-align: center">Compression flags</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">  9  </td>
+      <td style="text-align: center">  1  </td>
+      <td style="text-align: center">                </td>
+      <td style="text-align: center">Operating system</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /><br />
+So, if this header is present in any gzip compressed data, we can make a gzip compressed request to any webserver, wait for the gzip compressed response, check if the bytes starts with 0x1f 0x8b, and check for
+the compression date to know the exact date configured at the server that serves the page.</p>
+
+<div style="text-align:center;margin:25px">
+<img src="/assets/media/posts/timezone.jpg" />
+</div>
+
+<p>With normal webservers, this is only useful in a very limited scenarios, because the geopraphical position of the server is not hidden in any way, and can be known easily knowing the server IP address, that is not hidden at all.
+However, in a <strong>Hidden Service</strong>, the information about the server timezone can be very useful to identify the possible countries where the server is running.</p>
+
+<p>This, of course, <strong>its NOT a TOR fault and its not a bug in the tor protocol</strong> or anything like that, its just a obscure feature of the gzip format, available in the HTTP Protocol by default in most web servers.</p>
+
+<p>The good news is that lots of webservers are preconfigured to fill the date field of the gzip header with ‘0’s, maybe because of performance issues, who knows. After some research, I found that around 10%
+of the webservers leak the remote date when compressing HTTP Responses with gzip.</p>
+
+<p>For testing purposes, <strong>instagram.com</strong>, <strong>reddit.com</strong> and <strong>bing.com</strong> leak the remote date in the gzip encoded http response.</p>
+
+<p>Of course, because of privacy concerns, I’m not going to provide information on wich hidden services are leaking the remote date.</p>
+
+<h3 id="proof-of-concept">Proof Of Concept</h3>
+
+<p>I have developed a little php script that uses curl (command line) to get the remote server date if available in the gzip compressed HTTP Response. It will only work in web server that
+allows for compression of HTTP Responses, and fills the ‘date’ field of the gzip header with the correct date instead of zeroes.</p>
+
+<p>Examples of use:</p>
+
+<pre><code>user@localhost:~$ php time.php bing.com
+The server that processed the request on: bing.com has local date set to:
+Sunday 21st of February 2016 01:21:21 PM
+
+user@localhost:~$ php time.php reddit.com
+The server that processed the request on: reddit.com has local date set to:
+Sunday 21st of February 2016 09:21:25 PM
+
+user@localhost:~$ php time.php instagram.com
+The server that processed the request on: instagram.com has local date set to:
+Sunday 21st of February 2016 09:21:30 PM
+
+user@localhost:~$
+</code></pre>
+
+<p><br />
+The tool is available here:</p>
+
+<p><strong><em><a href="https://github.com/jcarlosn/gzip-http-time">https://github.com/jcarlosn/gzip-http-time</a></em></strong></p>
+
+
+	  </div>
+
+		
+		<ul class="tag_box list-unstyled list-inline">
+		  <li><i class="fa fa-folder-open"></i></li>
+		  
+		  
+			 
+				<li><a href="/categories.html#security-ref">
+					security <span>(1)</span>
+					
+				</a></li>
+			
+		  
+		</ul>
+		  
+
+		
+		<ul class="list-inline">
+		  <li><i class="fa fa-tags"></i></li>
+		  
+		  
+			 
+				<li>
+					<a href="/tags.html#security-ref">
+					security <span>(1)</span>
+					,
+					</a>
+				</li>
+			 
+				<li>
+					<a href="/tags.html#tor-ref">
+					tor <span>(1)</span>
+					,
+					</a>
+				</li>
+			 
+				<li>
+					<a href="/tags.html#privacy-ref">
+					privacy <span>(1)</span>
+					,
+					</a>
+				</li>
+			 
+				<li>
+					<a href="/tags.html#hacking-ref">
+					hacking <span>(1)</span>
+					
+					</a>
+				</li>
+			
+		  
+		  
+		</ul>
+		  
+
+		<hr>
+
+		<div>
+      <section class="share col-sm-6">
+        <h4 class="section-title">Share Post</h4>
+        <a class="btn btn-default btn-sm twitter" href="http://twitter.com/share?text=HTTP GZIP Compression remote date and time leak&via=jcarlosnorte"
+           onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+          <i class="fa fa-twitter fa-lg"></i>
+          Twitter
+        </a>
+        <a class="btn btn-default btn-sm facebook" href="https://www.facebook.com/sharer/sharer.php"
+           onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+          <i class="fa fa-facebook fa-lg"></i>
+          Facebook
+        </a>
+        <a class="btn btn-default btn-sm gplus"
+           onclick="window.open('https://plus.google.com/share?url='+window.location.href, 'google-plus-share', 'width=490,height=530');return false;">
+          <i class="fa fa-google-plus fa-lg"></i>
+          Google+
+        </a>
+      </section>
+
+      <section class="col-sm-6 author">
+        <img src="/assets/media/jcarlosn.png" class="img-rounded author-image" />
+        <h4 class="section-title author-name">Jose Carlos Norte</h4>
+        <p class="author-bio">Enterpreneur, Thinker, Agilist, Technology enthusiast, Computer programmer, I.T. security expert and FOSS supporter.</p>
+      </section>
+    </div>
+
+    <div class="clearfix"></div>
+
+		<ul class="pager">
+		  
+		  <li class="previous disabled"><a>&larr; Previous</a></li>
+		  
+		  
+			<li class="next disabled"><a>Next &rarr;</a>
+		  
+		</ul>
+
+		<hr>
+	</div>
+	
+	<div class="col-sm-2 sidebar-2">
+
+	</div>
+</article>
+<div class="clearfix"></div>
+
+
+
+    
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'jcarlosn';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+
+
+
+		<footer>
+			<hr/>
+			<p>
+				&copy; 2016 Jose Carlos Norte
+			</p>
+		</footer>
+	</div>
+
+	<script type="text/javascript" src="/assets/resources/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="/assets/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/assets/js/app.js"></script>
+</body>
+</html>
+
+
+
+<!-- Asynchronous Google Analytics snippet -->
+<script>
+  var _gaq = _gaq || [];
+  var pluginUrl =
+ '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'dbyll']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
