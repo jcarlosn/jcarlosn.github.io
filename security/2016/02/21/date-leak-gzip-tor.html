@@ -271,6 +271,20 @@ of the webservers leak the remote date when compressing HTTP Responses with gzip
 
 <p>Of course, because of privacy concerns, I’m not going to provide information on which hidden services are leaking the remote date.</p>
 
+<h3 id="gzip-specification">GZIP Specification</h3>
+<p>The <strong><em><a href="https://tools.ietf.org/html/rfc1952">gzip specification</a></em></strong> clearly states that the dates in the MTIME header should be in universal time, not in local time.
+However using the proof of concept provided it is easy to find servers in the open internet and in hidden services (tor) that are leaking local time through the gzip headers.</p>
+<p>While further investigation is needed, what is clear is that even if the specification states that universal times should be used for this header, there are servers in the wild
+that are using local times instead of universal, thus potentially leaking information about the time zone where the server is running</p>
+<p>Further investigation is needed to know which implementations are affected. There is some suspicions about Microsoft Windows, even the specification tiself clearly states that MS-DOS
+could have problems regarding the universal time, because of how MS-DOS works</p>
+<p>To be fair, at the time of this writing I am still unsure about which versions or softwares are affected. Help for understanding better why some servers send the local time instead of the universal time is appreciated.</p>
+
+<h3 id="clock-skew">Clock Skew identification</h3>
+<p>Even the implementations that are sending the universal time instead of the local time, in other words, even the correct implementations that are not filling the MTIME with zeros, but sending the correct universal time
+are prone to identification through clock skew attacks as you can read in the previous work by <strong><em><a href="http://sec.cs.ucl.ac.uk/users/smurdoch/papers/ccs06hotornot.pdf">Murdoch, 2006</a></em></strong> 
+<p>However, in this scenario the universal time provided in correct gzip implementations is just another side channel to mount the attack</p>
+
 <h3 id="proof-of-concept">Proof Of Concept</h3>
 
 <p>I have developed a little php script that uses curl (command line) to get the remote server date if available in the gzip compressed HTTP Response. It will only work in web server that
@@ -294,6 +308,8 @@ user@localhost:~$
 </code></pre>
 
 <p><br />
+<p>In this example all three servers are including times in the gzip headers, but reddit.com and instagram.com are providing universal times, whle bind.com is providing local times.</p>
+<br/>
 The Proof of concept is available here:</p>
 
 <p><strong><em><a href="https://github.com/jcarlosn/gzip-http-time">https://github.com/jcarlosn/gzip-http-time</a></em></strong></p>
