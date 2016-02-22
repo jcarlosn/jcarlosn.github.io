@@ -314,6 +314,26 @@ The Proof of concept is available here:</p>
 
 <p><strong><em><a href="https://github.com/jcarlosn/gzip-http-time">https://github.com/jcarlosn/gzip-http-time</a></em></strong></p>
 <br/>
+<h3 id="tor-affected">GZIP in tor itself</h3>
+<p>the TOR protocol itself uses gzip for some of its communications, however this issue was already known and taken into account when developing tor, as stated by
+Tim Wilson-Brown in the tor-onions mailing list.</p>
+<p>tor itself does not suffer from this issue, even though it uses gzip compression internally to compress directory documents.
+
+Hidden services and clients do not produce or recompress directory documents, so they could never be affected.
+
+And tor authorities use deflateInit2 to initialise compression for votes and consensuses, which zeroes the gzip header.
+
+From the deflateInit2 documentation in zlib.h:
+<pre><code>
+    "windowBits can also be greater than 15 for optional gzip encoding.  Add
+   16 to windowBits to write a simple gzip header and trailer around the
+   compressed data instead of a zlib wrapper.  The gzip header will have no
+   file name, no extra data, no comment, no modification time (set to zero), no
+   header crc, and the operating system will be set to 255 (unknown).  If a
+   gzip stream is being written, strm->adler is a crc32 instead of an adler32."
+</code></pre>
+</p>
+<p>You can see the entire conversation about this in the <strong><em><a href="https://lists.torproject.org/pipermail/tor-onions/2016-February/000081.html">tor-onions mailing lists</a></em></strong>
 
 <h3 id="thanks">Thanks</h3>
 <p>From the moment I found this potential issue I was affraid that this could be affecting the privacy of tor users even in remote ways. 
@@ -322,6 +342,7 @@ sending local times instead. Even with the confusion of early sharing this findi
 keep it secret while I try to understand better the impact. I believe that the most reponsible thing was to contact the onion tor mailing list, like I did, and to diffuse this article
 to raise concerns and get help understanding if this could be an issue.</p>
 <p>Thanks to HDM, brlewis and Henryk Plotz for joining the discussion and providing aditional information regarding the issue and helping clarify the potential impact it could have.</p>
+
 <br/>
 	  </div>
 
