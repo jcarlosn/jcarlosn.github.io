@@ -37,7 +37,7 @@ that could lead to the identification of the owner of the hidden service.&lt;/p&
 &lt;h3 id=&quot;leaking-the-timezone&quot;&gt;Leaking the timezone&lt;/h3&gt;
 &lt;p&gt;The HTTP protocol allows the client to inform the server about its compression capabilities. If the client and server share support for a specific compression format, the server can decide to compress the http
 response in order to save bandwidth and time. All major web servers and browsers support compression. The most common formats used for
-&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/HTTP_compression&quot;&gt;HTTP compression&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; are &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://www.gzip.org/&quot;&gt;gzip&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/DEFLATE&quot;&gt;DEFLATE&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
+&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/HTTP_compression&quot;&gt;HTTP compression&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; are &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://www.gzip.org/&quot;&gt;gzip&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/DEFLATE&quot;&gt;deflate&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
 
 &lt;p&gt;Gzip is a compression format that allows relative fast data compression with decent compression ratios.&lt;/p&gt;
 
