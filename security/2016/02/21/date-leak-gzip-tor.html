@@ -267,28 +267,35 @@ However, in a <strong>Hidden Service</strong>, the information about the server 
 <p>The good news is that lots of webservers are preconfigured to fill the date field of the gzip header with ‘0’s, maybe because of performance issues, who knows. After some research, I found that around 10%
 of the webservers leak the remote date when compressing HTTP Responses with gzip.</p>
 
-<p>For testing purposes, <strong>instagram.com</strong>, <strong>reddit.com</strong> and <strong>bing.com</strong> leak the remote date in the gzip encoded http response.</p>
-
-<p>Of course, because of privacy concerns, I’m not going to provide information on which hidden services are leaking the remote date.</p>
-
 <h3 id="gzip-specification">GZIP Specification</h3>
 <p>The <strong><em><a href="https://tools.ietf.org/html/rfc1952">gzip specification</a></em></strong> clearly states that the dates in the MTIME header should be in universal time, not in local time.
 However using the proof of concept provided it is easy to find servers in the open internet and in hidden services (tor) that are leaking local time through the gzip headers.</p>
-<p>While further investigation is needed, what is clear is that even if the specification states that universal times should be used for this header, there are servers in the wild
-that are using local times instead of universal, thus potentially leaking information about the time zone where the server is running</p>
-<p>Further investigation is needed to know which implementations are affected. There is some suspicions about Microsoft Windows, even the specification tiself clearly states that MS-DOS
-could have problems regarding the universal time, because of how MS-DOS works</p>
-<p>To be fair, at the time of this writing I am still unsure about which versions or softwares are affected. Help for understanding better why some servers send the local time instead of the universal time is appreciated.</p>
 
-<h3 id="clock-skew">Clock Skew identification</h3>
-<p>Even the implementations that are sending the universal time instead of the local time, in other words, even the correct implementations that are not filling the MTIME with zeros, but sending the correct universal time
-are prone to identification through clock skew attacks as you can read in the previous work by <strong><em><a href="http://sec.cs.ucl.ac.uk/users/smurdoch/papers/ccs06hotornot.pdf">Murdoch, 2006</a></em></strong> 
+<p>While further investigation is needed, what is clear is that even if the specification states that universal times should be used for this header,
+there are servers in the wild that are using local times instead of universal, thus potentially leaking information about the time zone where the server is running</p>
+
+<p>Further investigation is needed to know which implementations are affected. There is some suspicions about Microsoft Windows, even the specification itself
+clearly states that MS-DOS could have problems regarding the universal time, because of how MS-DOS works</p>
+
+<p>To be fair, at the time of this writing I am still unsure about which versions or softwares are affected. Help for understanding better why some servers send the local time instead
+of the universal time is appreciated.</p>
+
+<h3 id="clock-skew-identification">Clock Skew identification</h3>
+<p>Even the implementations that are sending the universal time instead of the local time, in other words, even the correct implementations that
+are not filling the MTIME with zeros, but sending the correct universal time are prone to identification through clock skew attacks as you can read in the previous work by
+<strong><em><a href="http://sec.cs.ucl.ac.uk/users/smurdoch/papers/ccs06hotornot.pdf">Murdoch, 2006</a></em></strong></p>
+
 <p>However, in this scenario the universal time provided in correct gzip implementations is just another side channel to mount the attack</p>
 
 <h3 id="proof-of-concept">Proof Of Concept</h3>
 
 <p>I have developed a little php script that uses curl (command line) to get the remote server date if available in the gzip compressed HTTP Response. It will only work in web server that
 allows for compression of HTTP Responses, and fills the ‘date’ field of the gzip header with the correct date instead of zeroes.</p>
+
+<p>I have tested it with some servers, an example of servers where a date is sent in the gzip header are <strong>instagram.com</strong>, <strong>reddit.com</strong> and <strong>bing.com</strong>. In this example
+<strong>reddit.com</strong> and <strong>instagram.com</strong> are sending universal times, as the specification states. <strong>bing.com</strong> is sending local times.</p>
+
+<p>Of course, because of privacy concerns, I’m not going to provide information on which hidden services are leaking the remote date.</p>
 
 <p>Examples of use:</p>
 
@@ -307,43 +314,38 @@ Sunday 21st of February 2016 09:21:30 PM
 user@localhost:~$
 </code></pre>
 
+<p>In this example all three servers are including times in the gzip headers, but <strong>reddit.com and instagram.com are providing universal times</strong>, while <strong>bing.com is providing local times</strong>.</p>
+
 <p><br />
-<p>In this example all three servers are including times in the gzip headers, <strong>but reddit.com and instagram.com are providing universal times</strong>, whle <strong>bing.com is providing local times</strong>.</p>
-<br/>
 The Proof of concept is available here:</p>
 
 <p><strong><em><a href="https://github.com/jcarlosn/gzip-http-time">https://github.com/jcarlosn/gzip-http-time</a></em></strong></p>
-<br/>
-<h3 id="tor-affected">GZIP in tor itself</h3>
-<p>the TOR protocol itself uses gzip for some of its communications, however this issue was already known and taken into account when developing tor, as stated by
-Tim Wilson-Brown in the tor-onions mailing list.</p>
-<p>tor itself does not suffer from this issue, even though it uses gzip compression internally to compress directory documents.
 
-Hidden services and clients do not produce or recompress directory documents, so they could never be affected.
+<p><br /></p>
 
-And tor authorities use deflateInit2 to initialise compression for votes and consensuses, which zeroes the gzip header.
+<h3 id="gzip-in-tor-itself">GZIP in tor itself</h3>
 
-From the deflateInit2 documentation in zlib.h:
-<pre><code>
-    "windowBits can also be greater than 15 for optional gzip encoding.  Add
+<p>the TOR protocol itself uses gzip for some of its communications, however this issue was already known and taken into account when developing tor,
+as stated by Tim Wilson-Brown in the tor-onions mailing list.</p>
+
+<p>TOR itself does not suffer from this issue, even though it uses gzip compression internally to compress directory documents. Hidden services and clients do not produce or recompress directory documents, so they could never be affected. And tor authorities use deflateInit2 to initialise compression for votes and consensuses, which zeroes the gzip header. From the deflateInit2 documentation in zlib.h:</p>
+
+<pre><code>    "windowBits can also be greater than 15 for optional gzip encoding.  Add
    16 to windowBits to write a simple gzip header and trailer around the
    compressed data instead of a zlib wrapper.  The gzip header will have no
    file name, no extra data, no comment, no modification time (set to zero), no
    header crc, and the operating system will be set to 255 (unknown).  If a
-   gzip stream is being written, strm->adler is a crc32 instead of an adler32."
+   gzip stream is being written, strm-&gt;adler is a crc32 instead of an adler32."
 </code></pre>
-</p>
-<p>You can see the entire conversation about this in the <strong><em><a href="https://lists.torproject.org/pipermail/tor-onions/2016-February/000081.html">tor-onions mailing lists</a></em></strong>
+
+<p>You can see the entire conversation about this in the <strong><em><a href="https://lists.torproject.org/pipermail/tor-onions/2016-February/000081.html">tor-onions</a></em></strong> mailing lists</p>
 
 <h3 id="thanks">Thanks</h3>
-<p>From the moment I found this potential issue I was affraid that this could be affecting the privacy of tor users even in remote ways. 
-It has been a bit complicated to understand why this was happening and why while the gzip specification clearly states that the time should be universal, some servers where 
-sending local times instead. Even with the confusion of early sharing this findings I believe that has been more constructive to openly discuss this potential issue than to
-keep it secret while I try to understand better the impact. I believe that the most reponsible thing was to contact the onion tor mailing list, like I did, and to diffuse this article
-to raise concerns and get help understanding if this could be an issue.</p>
+<p>From the moment I found this potential issue I was affraid that this could be affecting the privacy of tor users even in remote ways. It has been a bit complicated to understand why this was happening and why while the gzip specification clearly states that the time should be universal, some servers where sending local times instead. Even with the confusion of early sharing this findings I believe that has been more constructive to openly discuss this potential issue than to keep it secret while I try to understand better the impact. I believe that the most reponsible thing was to contact the onion tor mailing list, like I did, and to diffuse this article to raise concerns and get help understanding if this could be an issue.</p>
+
 <p>Thanks to HDM, brlewis and Henryk Plotz for joining the discussion and providing aditional information regarding the issue and helping clarify the potential impact it could have.</p>
 
-<br/>
+
 	  </div>
 
 		
