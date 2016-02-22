@@ -308,13 +308,21 @@ user@localhost:~$
 </code></pre>
 
 <p><br />
-<p>In this example all three servers are including times in the gzip headers, but reddit.com and instagram.com are providing universal times, whle bing.com is providing local times.</p>
+<p>In this example all three servers are including times in the gzip headers, <strong>but reddit.com and instagram.com are providing universal times</strong>, whle <strong>bing.com is providing local times</strong>.</p>
 <br/>
 The Proof of concept is available here:</p>
 
 <p><strong><em><a href="https://github.com/jcarlosn/gzip-http-time">https://github.com/jcarlosn/gzip-http-time</a></em></strong></p>
+<br/>
 
-
+<h3 id="thanks">Thanks</h3>
+<p>From the moment I found this potential issue I was affraid that this could be affecting the privacy of tor users even in remote ways. 
+It has been a bit complicated to understand why this was happening and why while the gzip specification clearly states that the time should be universal, some servers where 
+sending local times instead. Even with the confusion of early sharing this findings I believe that has been more constructive to openly discuss this potential issue than to
+keep it secret while I try to understand better the impact. I believe that the most reponsible thing was to contact the onion tor mailing list, like I did, and to diffuse this article
+to raise concerns and get help understanding if this could be an issue.</p>
+<p>Thanks to HDM, brlewis and Henryk Plotz for providing aditional information regarding the issue and helping clarify the potential impact it could have.</p>
+<br/>
 	  </div>
 
 		
