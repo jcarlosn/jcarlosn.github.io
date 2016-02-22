@@ -190,6 +190,8 @@ as stated by Tim Wilson-Brown in the tor-onions mailing list.&lt;/p&gt;
 
 &lt;p&gt;Thanks to HDM, brlewis and Henryk Plotz for joining the discussion and providing aditional information regarding the issue and helping clarify the potential impact it could have.&lt;/p&gt;
 
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;Last updated at: 2/22/2016 8:50:16 PM UTC. Corrected some mistakes and added more information provided in the comments&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
 </description>
 				<pubDate>Sun, 21 Feb 2016 00:00:00 +0100</pubDate>
 				<link>/security/2016/02/21/date-leak-gzip-tor.html</link>
