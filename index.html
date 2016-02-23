@@ -204,7 +204,7 @@ response in order to save bandwidth and time. All major web servers and browsers
 <p>Gzip is a compression format that allows relative fast data compression with decent compression ratios.</p>
 
 <p>As a compression format, gzip specifies a data header to be included in the resulting compressed data, this header includes information about the compressed data, the operating system that compressed the data, and
-most importantly: <strong>the date when the data was compressed</strong>.</p>
+most importantly: <strong>the date when the data was compressed</strong>, in theory in universal time (UTC).</p>
 
 <p>The header is as follows, as you can see in <strong><em><a href="http://www.forensicswiki.org/wiki/Gzip">Foreniscs Wiki</a></em></strong>:
 <br /><br /></p>
@@ -269,23 +269,14 @@ the compression date to know the exact date configured at the server that serves
 <p>With normal webservers, this is only useful in a very limited scenarios, because the geopraphical position of the server is not hidden in any way, and can be known easily knowing the server IP address, that is not hidden at all.
 However, in a <strong>Hidden Service</strong>, the information about the server timezone can be very useful to identify the possible countries where the server is running.</p>
 
-<p>This, of course, <strong>its NOT a TOR fault and its not a bug in the tor protocol</strong> or anything like that, its just a obscure feature of the gzip format, available in the HTTP Protocol by default in most web servers.</p>
+<p>The GZIP specification clearly states that universal time should be used instead of local time for the MTIME header field. However, I have found lots of sites sending local times instead of universal times.
+It seems that <strong>maybe</strong> the flaw is in Microsoft Windows, but further investigation is needed to clarify which implementations are not following the specification and are leaking the local time.</p>
+
+<p>This, of course, <strong>its NOT a TOR fault and its not a bug in the tor protocol</strong> and <strong>IS NOT a problem with the GZIP spec</strong>, but with certain implementations.
+Its just a obscure feature of the gzip format that has ben wrongly implemented by some vendors, and made available in the HTTP Protocol by default in most web servers.</p>
 
 <p>The good news is that lots of webservers are preconfigured to fill the date field of the gzip header with ‘0’s, maybe because of performance issues, who knows. After some research, I found that around 10%
-of the webservers leak the remote date when compressing HTTP Responses with gzip.</p>
-
-<h3 id="gzip-specification">GZIP Specification</h3>
-<p>The <strong><em><a href="https://tools.ietf.org/html/rfc1952">gzip specification</a></em></strong> clearly states that the dates in the MTIME header should be in universal time, not in local time.
-However using the proof of concept provided it is easy to find servers in the open internet and in hidden services (tor) that are leaking local time through the gzip headers.</p>
-
-<p>While further investigation is needed, what is clear is that even if the specification states that universal times should be used for this header,
-there are servers in the wild that are using local times instead of universal, thus potentially leaking information about the time zone where the server is running</p>
-
-<p>Further investigation is needed to know which implementations are affected. There is some suspicions about Microsoft Windows, even the specification itself
-clearly states that MS-DOS could have problems regarding the universal time, because of how MS-DOS works</p>
-
-<p>To be fair, at the time of this writing I am still unsure about which versions or softwares are affected. Help for understanding better why some servers send the local time instead
-of the universal time is appreciated.</p>
+of the webservers leak the remote date when compressing HTTP Responses with gzip, and only some of the servers that includes the remote date in the headers fails to use UTC instead of local time.</p>
 
 <h3 id="clock-skew-identification">Clock Skew identification</h3>
 <p>Even the implementations that are sending the universal time instead of the local time, in other words, even the correct implementations that
