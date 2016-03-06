@@ -1,0 +1,22 @@
+{
+  "name": "ubercookie",
+  "authors": [
+    "Jose Carlos Norte <jcarlos.norte@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "http://jcarlosnorte.com",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery-dist": "^2.1.3"
+  }
+}

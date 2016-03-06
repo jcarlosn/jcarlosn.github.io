@@ -1,0 +1,31 @@
+<html>
+<head>
+    <script src="timeProvider.js"></script>
+    <title>UberCookie demo by Jose Carlos Norte - http://jcarlosnorte.com</title>
+</head>
+<body>
+<script>
+    var tc = new TimeProvider();
+    tc.start('timeProvider_Worker.js');
+
+    console.log('Asking for the date');
+    var ltime;
+    tc.getCurrentTime(function(a) {
+        console.log(a);
+        ltime = a;
+    });
+
+
+    var wait = 100;
+    //waiting 15 milis
+    setTimeout(function() {
+        console.log('Asking for the date after ', wait);
+        tc.getCurrentTime(function(a) {
+            var error = (ltime + wait) - a;
+            console.log(a);
+            console.log('error: ', error);
+        });
+    }, wait);
+</script>
+</body>
+</html>

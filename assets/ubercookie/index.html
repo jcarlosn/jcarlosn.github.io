@@ -1,0 +1,204 @@
+<html>
+<head>
+    <script src="bower_components/jquery-dist/jquery.min.js"></script>
+    <script src="script/time/timeProvider.js"></script>
+    <script src="script/bench/bench.js"></script>
+    <script>
+        var firstClick = true;
+        var first = true;
+        var stop = false;
+        var time = 0;
+        var am = 0;
+        var deltas = [];
+        var milis = [];
+        var lastTime = 0;
+        var biggestStep = 0;
+        var jbody = $(document);
+        var lastScrollPos;
+        setInterval(function() {
+            time++;
+        }, 1);
+
+        $(function() {
+
+            var prevX, prevY;
+            document.addEventListener('mouseout', function(evt) {
+                if (evt.toElement == null && evt.relatedTarget == null) {
+                    first = true; //reset mouse speed
+                }
+            });
+            $( "body" ).mousemove(function( event ) {
+                if(stop) {
+                    return;
+                }
+                if(first) {
+                    first = false;
+                } else {
+                    var dist = Math.max(Math.abs(event.pageX - prevX),Math.abs(event.pageY - prevY));
+                    if(dist > biggestStep && lastScrollPos == jbody.scrollTop()) {
+                        biggestStep = dist;
+                        console.log(biggestStep);
+                    }
+                }
+                lastScrollPos = jbody.scrollTop();
+                prevX = event.pageX;
+                prevY = event.pageY;
+            });
+
+            document.body.addEventListener("wheel", function(e) {
+                first = true;
+                am++;
+                var cmilis = time - lastTime;
+                if(lastTime) {
+                    milis.push(cmilis);
+                }
+
+                lastTime = time;
+
+                deltas.push(Math.max(e.deltaX, e.deltaY, e.deltaZ));
+            });
+        });
+
+        function testCpu(cb) {
+            var tc = new TimeProvider();
+            tc.start();
+            tc.getCurrentTime(function(startTime) {
+                var bench = new Benchmark(tc);
+                bench.start();
+                bench.bench(function(result) {
+                    cb(result);
+                });
+            });
+        }
+
+        function whoami() {
+            if(firstClick) {
+                document.getElementById('whoami').style.float = 'right';
+                firstClick = false;
+            } else if($("#privacy").is(':checked')) {
+                stop = true;
+                testCpu(function (result) {
+                    setTimeout(function () {
+                        testCpu(function (result2) {
+                            var mean = (result + result2) / 2;
+                            document.getElementById('results').innerHTML =  document.getElementById('results').innerHTML + 'CPU Mean: '+ mean
+                        });
+                    }, 100);
+                });
+                console.log('milis: ', milis);
+                console.log('deltas: ', deltas);
+                console.log('biggest mouse step: ', biggestStep);
+                console.log('Client rects: ', document.getElementById('textlol').getClientRects()[0]);
+                console.log('Executing CPU benchmark, it could take a few seconds... please wait');
+                var result = "";
+                var rects = {};
+                var rect = document.getElementById('textlol').getClientRects()[0];
+                for(var i in rect) {
+                    rects[i] = rect[i];
+                }
+                result += 'Client rects: ' + JSON.stringify(rects) + "\n\n";
+                result += 'scrolling milis: ' + JSON.stringify(milis)+ "\n\n";
+                result += 'scrolling deltas: ' + JSON.stringify(deltas)+ "\n\n";
+                result += 'Biggest mouse step: ' + JSON.stringify(biggestStep)+ "\n\n";
+
+                result += 'In a few seconds, the result of the CPU benchmark will appear, please wait...\n\n';
+                document.getElementById('results').innerHTML = result;
+            } else {
+                    first = true;
+                    alert('You need to accept the terms at the bottom of this page first, please scroll down');
+            }
+
+        }
+    </script>
+    <title>UberCookie demo by Jose Carlos Norte - http://jcarlosnorte.com</title>
+</head>
+<body>
+
+<div style="text-align:center">
+<br/>
+<br/>
+
+    <textarea style="width:600px;height:300px" id="results">
+    Results will appear here...
+    </textarea>
+<br/>
+<br/>
+This is a test that tries to identify who are you based on how you interact with your computer, the input hardware you have,
+the computing power of your computer, the memory speed of your computer and similar things.
+<br/>
+    <br/>
+Each one of this little things reveal bits of entropy about who you are.
+<br/>
+<br/>
+    <strong id="textlol">IMPORTANT: try to behave normal, like you would do while surfing the web, simply use this web</strong>
+<br/>
+<br/>
+<br/>
+</div>
+<strong>Click to discover who you are: </strong><input style="" id="whoami" type="submit" value="Who am I?" onclick="whoami();" />
+<div style="text-align:center">
+
+    <br /><br/>
+    Please, scroll down to accept the conditions of the test before clicking this button
+
+    <br />.<br/>.
+    <br />.<br/>.<br />.<br/>.
+    <br /.><br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.<br />.<br/>
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br />.<br/>.
+    <br /><br/>
+    <input type="checkbox" name="privacy" id="privacy" value="privacy" /> I accept to do this silly test
+    <br /><br/>
+    <br /><br/>
+    <br /><br/>
+    <br /><br/>
+</div>
+
+</body>
+</html>

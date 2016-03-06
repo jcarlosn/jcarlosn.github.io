@@ -7,6 +7,180 @@
 		<atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Advanced Tor Browser Fingerprinting</title>
+				<description>&lt;h3 id=&quot;tor-browser&quot;&gt;Tor Browser&lt;/h3&gt;
+
+&lt;p&gt;The ability to privately communicate through the internet is very important for dissidents living under authoritary regimes,
+activists and basically everyone concerned about internet privacy.&lt;/p&gt;
+
+&lt;p&gt;While the &lt;a href=&quot;https://www.torproject.org/&quot;&gt;&lt;strong&gt;TOR&lt;/strong&gt;&lt;/a&gt; network itself provides a good level of privacy, making difficult or even practically impossible
+to discover the real I.P. address of the tor users, this is by no means enough to protect users privacy on the web. When browsing the web,
+your identity can be discovered using browser exploits, cookies, browser history, browser plugins, etc.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://www.torproject.org/projects/torbrowser.html&quot;&gt;Tor browser&lt;/a&gt;&lt;/strong&gt; is a firefox browser preconfigured and modified
+to protect user privacy and identity while browsing the web using TOR. Browser plugins are disabled, history and cache aren’t persistent
+and everything is erased after closing the browser, etc.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-user-fingerprinting-problem&quot;&gt;The user fingerprinting problem&lt;/h3&gt;
+
+&lt;p&gt;While preventing users IP address to be disclosed is a key aspect for protecting their privacy, a lot of other things need
+to be taken into consideration. Tor browser is preconfigured to prevent a lot of possible attacks on user privacy, not only
+the communications layer provided by tor itself.&lt;/p&gt;
+
+&lt;p&gt;One common problem that tor browser tries to address is user fingerprinting. If a website is able to generate a unique
+fingerprint that identifies each user that enters the page, then it is possible to track the activity of this user
+in time, for example, correlate visits of the user during an entire year, knowing that its the same user.&lt;/p&gt;
+
+&lt;p&gt;Or even worse, &lt;strong&gt;it could be possible to identify the user if the fingerprint is the same in tor browser and in the normal
+browser used to browse internet&lt;/strong&gt;. It is very important for the tor browser to prevent any attempt on fingerprinting the user.&lt;/p&gt;
+
+&lt;div style=&quot;text-align:center;margin:25px&quot;&gt;
+&lt;img src=&quot;/assets/media/posts/digital_fingerprint_small.png&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In the past, a lot of fingerprinting methods has been used and proposed and tor browser has been updated with countermeasures.
+Examples of that are reading text sizes out of a canvas element, screen dimensions, local time, operating system information, etc.&lt;/p&gt;
+
+&lt;p&gt;One famous example of browser fingerprinting was &lt;strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Canvas_fingerprinting&quot;&gt;Canvas fingerprinting&lt;/a&gt;&lt;/strong&gt;.
+As of today, almost everything that can be used to identify the user has been disabled in tor browser.&lt;/p&gt;
+
+&lt;h3 id=&quot;ubercookie&quot;&gt;UberCookie&lt;/h3&gt;
+
+&lt;p&gt;During the last weeks I have been able to fingerprint tor browser users in controlled environments and I think it could be interesting
+to share all the findings for further discussion and to improve tor browser.&lt;/p&gt;
+
+&lt;p&gt;All the provided fingerprinting methods are based on javascript (enabled by default in tor browser as of today). I have created a quick and dirty
+PoC called UberCookie available as a demo here:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&quot;/assets/ubercookie/&quot;&gt;Try ubercookie&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;measuring-time&quot;&gt;Measuring time&lt;/h3&gt;
+
+&lt;p&gt;One interesting countermeasure for fingerprint implemented in tor browser is that javascript Date.getTime() (unix time) only updated each 100ms. So you can’t measure
+events happening under 100ms. This is useful to prevent a javascript inside a webpage to measure events in order to fingerprint the user. Since for some of the things
+I wanted to try needed better time accuracy than 100ms, this was the first thing to bypass.&lt;/p&gt;
+
+&lt;p&gt;There are a lot of ways to measure times smaller than 100ms using javascript in tor browser, some are obvious, or ther are intersting.&lt;/p&gt;
+
+&lt;p&gt;The first one I implemented was simply increment a variable by 1 each millisecond using setInterval. Even if the precision is not at milisecond level,
+is extremly better than the 100ms accuracy provided by Date.getTime.&lt;/p&gt;
+
+&lt;p&gt;Another way you can use to measure time is to create an animation in CSS3, configured at 1ms interval and listen to the animationiteration event.&lt;/p&gt;
+
+&lt;p&gt;However, the better accuracy I could achieve was using setInterval incrementing inside a webworker.&lt;/p&gt;
+
+&lt;h3 id=&quot;mouse-wheel-fingerprinting&quot;&gt;Mouse wheel fingerprinting&lt;/h3&gt;
+
+&lt;p&gt;The mouse wheel event in Tor Browser (and most browsers) leaks information of the underlying hardware used to scroll the webpage.
+The event provides information about the delta scrolled, however if you are using a normal computer mouse with a mouse wheel, the delta is always three, but
+if you are using a trackpad, the deltas are variable and related to your trackpad and your usage patterns.&lt;/p&gt;
+
+&lt;div style=&quot;text-align:center;margin:25px&quot;&gt;
+&lt;img src=&quot;/assets/media/posts/mousehweel.png&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Another leak in the mouse wheel, is the scroll speed that is linked to the configuration of the operating system and the
+hardware capabilities itself.&lt;/p&gt;
+
+&lt;p&gt;I have created a little experiment as a proof of concept, available here:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&quot;/assets/fingerprint/&quot;&gt;Mouse wheel information leak demo&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;This demo creates three graphs, one with the scrolling speed, another with the scrolling delta, and another one with the number
+of times the user scrolled in the red box.&lt;/p&gt;
+
+&lt;h3 id=&quot;mouse-speed-fingerprinting&quot;&gt;Mouse Speed fingerprinting&lt;/h3&gt;
+
+&lt;p&gt;Another interesting fingerprint that could reveal some entropy is the speed of the mouse moving acrross the webpage. Since the
+speed of the mouse is controlled by the operating system and related to hardware, and can be read using javascript if you can measure time
+using the mentioned strategies.&lt;/p&gt;
+
+&lt;p&gt;It could be interesting also to measure average mouse speed while the user is in the page moving the mouse.&lt;/p&gt;
+
+&lt;h3 id=&quot;cpu-benchmark-fingerprinting&quot;&gt;CPU Benchmark fingerprinting&lt;/h3&gt;
+
+&lt;p&gt;With the improved accuracy on time provided by the setInterval inside the WebWorker, it is easy to create a CPU intensive
+script (or even memory intensive) and measure how long it takes for the user browser to execute it.&lt;/p&gt;
+
+&lt;p&gt;I have done some tests with different computers, getting completely different results, all of them using the same tor browser
+version.&lt;/p&gt;
+
+&lt;h3 id=&quot;getclientrects-fingerprinting&quot;&gt;getClientRects fingerprinting&lt;/h3&gt;
+
+&lt;p&gt;The most intersting fingerprinting vector I found on Tor Browser is &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects&quot;&gt;getClientRects&lt;/a&gt;.
+Is strange that reading back from a canvas has been prevented but simply asking the browser javascript API how a specific DOM elements has been drawn on the screen
+has not been prevented or protected in any way.&lt;/p&gt;
+
+&lt;p&gt;getClientRects allows to get the exact pixel position and size of the box of a given DOM element. Depending on the resolution, font configuration and lots of other factors,
+the results of getClientRects are different, allowing for a very quick and easy fingerprinting vector, even better than the canvas fingerprinting that is fixed.&lt;/p&gt;
+
+&lt;p&gt;Example of getClientRects on the same page with same Tor Browser version on different computers:&lt;/p&gt;
+
+&lt;p&gt;Computer 1:&lt;/p&gt;
+
+&lt;div style=&quot;text-align:center;margin:25px&quot;&gt;
+&lt;img src=&quot;/assets/media/posts/rect1.png&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Computer 2:&lt;/p&gt;
+
+&lt;div style=&quot;text-align:center;margin:25px&quot;&gt;
+&lt;img src=&quot;/assets/media/posts/rect2.png&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;As you can see, there is a lof of difference in the results of getClientRects between two computers using the same tor browser on the same page
+and on the same DOM Element.&lt;/p&gt;
+
+&lt;h3 id=&quot;results&quot;&gt;Results&lt;/h3&gt;
+
+&lt;p&gt;An example of running ubercookie PoC in one computer (computer 1):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Client rects: {&quot;x&quot;:131.5,&quot;y&quot;:462,&quot;width&quot;:724,&quot;height&quot;:19,&quot;top&quot;:462,&quot;right&quot;:855.5,&quot;bottom&quot;:481,&quot;left&quot;:131.5}
+
+scrolling milis: [2,2,0,3,0,1,0,2,3,0,0,3,1,2,2,1,2,1,4,4,35,2,1,3,0,1,0,3,0,1,0,3,0,1,0,3,1,0,3,1,3,0,1,3,2,4,4,8,44,4,1,4,4,405,2,3,2,1,3,1,3,57,2,0,2,2,0,2,2,4,60,2,0,2,2,0,2,2,6,54,2,2,2,0,2,1,4,8]
+
+scrolling deltas: [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+Biggest mouse step: 65
+
+In a few seconds, the result of the CPU benchmark will appear, please wait...
+
+CPU Mean: 3245
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And the result of running it in a different computer (computer 2), same Tor browser version:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Client rects: {&quot;x&quot;:159.51666259765625,&quot;y&quot;:465.25,&quot;width&quot;:664.6500244140625,&quot;height&quot;:18.449996948242188,&quot;top&quot;:465.25,&quot;right&quot;:824.1666870117188,&quot;bottom&quot;:483.6999969482422,&quot;left&quot;:159.51666259765625}
+
+scrolling milis: [0,3,0,2,2,2,2,0,3,0,2,1,2,2,1,3,1,1,4,1,2,1,1,3,1,2,2,3,2,5,3,3,5,3,0,0,2,0,2,0,1,1,0,2,0,3,2,1,1,3,1,3,2,3,1,3,2,2,2,2,0,2,3,2,2,2,244,0,2,1,2,1,3,2,0,2,0,1,2,1,0,2,0,3,1,0,2,1,1,1,2,1,1,1,1,1,1,2,2,1,2,2,2,2,1,4,2,2,2,2,2,4,2]
+
+scrolling deltas: [3,0.975,1.65,1.5,1.725,2.25,2.775,2.4,3.15,3.375,3.975,3.675,4.35,4.95,5.625,5.55,5.25,5.25,4.2,6.3,9.975,13.95,7.575,6.9,2.85,5.925,8.85,0.9,4.425,3.675,4.725,2.625,2.4,5.475,2.625,3.675,5.4,5.775,7.275,6.975,8.175,9,8.475,3.45,2.475,2.25,0.6,1.8,11.1,8.4,8.475,8.1,7.5,6.375,8.175,4.95,4.8,4.275,3.525,3.375,1.125,2.7,2.175,1.95,1.65,1.2,1.05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+Biggest mouse step: 40
+
+In a few seconds, the result of the CPU benchmark will appear, please wait...
+
+CPU Mean: 4660.5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It is evident that the getClientRects are completly different, providing an interesting fingerprinting vector.
+The scrolling speed (milis) is also different.
+The scrolling deltas are very different, because of hardware differences. The mouse of computer 1 is faster, as you can see in ‘biggest mouse step’.
+The CPU benchmark provides different results, computer 1 being faster than computer 2.&lt;/p&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;It is easy to fingerprint users using tor browser to track their activity online and correlate their visits to different pages.
+getClientrects provides a very interesting vector for fingerprinting TOR Browser users. The CPU benchmark and the Mouse wheel and mouse speed
+methods provide even more information to distinguish between similar users.&lt;/p&gt;
+
+</description>
+				<pubDate>Sun, 06 Mar 2016 00:00:00 +0100</pubDate>
+				<link>/security/2016/03/06/advanced-tor-browser-fingerprinting.html</link>
+				<guid isPermaLink="true">/security/2016/03/06/advanced-tor-browser-fingerprinting.html</guid>
+			</item>
+		
+			<item>
 				<title>HTTP GZIP Compression remote date and time leak</title>
 				<description>&lt;h3 id=&quot;hidden-services-in-tor&quot;&gt;Hidden Services in TOR&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://www.torproject.org/&quot;&gt;Tor&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; is a service run by a network of volunteers to allow people to use internet anonymously. Normally tor is used to browse the web
@@ -37,12 +211,12 @@ that could lead to the identification of the owner of the hidden service.&lt;/p&
 &lt;h3 id=&quot;leaking-the-timezone&quot;&gt;Leaking the timezone&lt;/h3&gt;
 &lt;p&gt;The HTTP protocol allows the client to inform the server about its compression capabilities. If the client and server share support for a specific compression format, the server can decide to compress the http
 response in order to save bandwidth and time. All major web servers and browsers support compression. The most common formats used for
-&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/HTTP_compression&quot;&gt;HTTP compression&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; are &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://www.gzip.org/&quot;&gt;gzip&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/DEFLATE&quot;&gt;deflate&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
+&lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/HTTP_compression&quot;&gt;HTTP compression&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; are &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://www.gzip.org/&quot;&gt;gzip&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://zlib.net&quot;&gt;deflate&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;.&lt;/p&gt;
 
 &lt;p&gt;Gzip is a compression format that allows relative fast data compression with decent compression ratios.&lt;/p&gt;
 
 &lt;p&gt;As a compression format, gzip specifies a data header to be included in the resulting compressed data, this header includes information about the compressed data, the operating system that compressed the data, and
-most importantly: &lt;strong&gt;the date when the data was compressed&lt;/strong&gt;.&lt;/p&gt;
+most importantly: &lt;strong&gt;the date when the data was compressed&lt;/strong&gt;, in theory in universal time (UTC).&lt;/p&gt;
 
 &lt;p&gt;The header is as follows, as you can see in &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;http://www.forensicswiki.org/wiki/Gzip&quot;&gt;Foreniscs Wiki&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt;:
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
@@ -107,23 +281,14 @@ the compression date to know the exact date configured at the server that serves
 &lt;p&gt;With normal webservers, this is only useful in a very limited scenarios, because the geopraphical position of the server is not hidden in any way, and can be known easily knowing the server IP address, that is not hidden at all.
 However, in a &lt;strong&gt;Hidden Service&lt;/strong&gt;, the information about the server timezone can be very useful to identify the possible countries where the server is running.&lt;/p&gt;
 
-&lt;p&gt;This, of course, &lt;strong&gt;its NOT a TOR fault and its not a bug in the tor protocol&lt;/strong&gt; or anything like that, its just a obscure feature of the gzip format, available in the HTTP Protocol by default in most web servers.&lt;/p&gt;
+&lt;p&gt;The GZIP specification clearly states that universal time should be used instead of local time for the MTIME header field. However, I have found lots of sites sending local times instead of universal times.
+It seems that &lt;strong&gt;maybe&lt;/strong&gt; the flaw is in Microsoft Windows, but further investigation is needed to clarify which implementations are not following the specification and are leaking the local time.&lt;/p&gt;
+
+&lt;p&gt;This, of course, &lt;strong&gt;its NOT a TOR fault and its not a bug in the tor protocol&lt;/strong&gt; and &lt;strong&gt;IS NOT a problem with the GZIP spec&lt;/strong&gt;, but with certain implementations.
+Its just a obscure feature of the gzip format that has ben wrongly implemented by some vendors, and made available in the HTTP Protocol by default in most web servers.&lt;/p&gt;
 
 &lt;p&gt;The good news is that lots of webservers are preconfigured to fill the date field of the gzip header with ‘0’s, maybe because of performance issues, who knows. After some research, I found that around 10%
-of the webservers leak the remote date when compressing HTTP Responses with gzip.&lt;/p&gt;
-
-&lt;h3 id=&quot;gzip-specification&quot;&gt;GZIP Specification&lt;/h3&gt;
-&lt;p&gt;The &lt;strong&gt;&lt;em&gt;&lt;a href=&quot;https://tools.ietf.org/html/rfc1952&quot;&gt;gzip specification&lt;/a&gt;&lt;/em&gt;&lt;/strong&gt; clearly states that the dates in the MTIME header should be in universal time, not in local time.
-However using the proof of concept provided it is easy to find servers in the open internet and in hidden services (tor) that are leaking local time through the gzip headers.&lt;/p&gt;
-
-&lt;p&gt;While further investigation is needed, what is clear is that even if the specification states that universal times should be used for this header,
-there are servers in the wild that are using local times instead of universal, thus potentially leaking information about the time zone where the server is running&lt;/p&gt;
-
-&lt;p&gt;Further investigation is needed to know which implementations are affected. There is some suspicions about Microsoft Windows, even the specification itself
-clearly states that MS-DOS could have problems regarding the universal time, because of how MS-DOS works&lt;/p&gt;
-
-&lt;p&gt;To be fair, at the time of this writing I am still unsure about which versions or softwares are affected. Help for understanding better why some servers send the local time instead
-of the universal time is appreciated.&lt;/p&gt;
+of the webservers leak the remote date when compressing HTTP Responses with gzip, and only some of the servers that includes the remote date in the headers fails to use UTC instead of local time.&lt;/p&gt;
 
 &lt;h3 id=&quot;clock-skew-identification&quot;&gt;Clock Skew identification&lt;/h3&gt;
 &lt;p&gt;Even the implementations that are sending the universal time instead of the local time, in other words, even the correct implementations that

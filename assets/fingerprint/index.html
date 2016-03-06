@@ -1,0 +1,134 @@
+<html>
+<head>
+    <title>test</title>
+    <script src="Chart.min.js"></script>
+
+</head>
+<body>
+scroll inside the read box, then move the mouse out of the red box to see the results
+<div id="myDIV" style="width:400px;height:200px;background-color:red" onmouseout="drawGraph()"></div>
+<canvas id="myChart" style="margin-top:50px;border:1px solid black" width="600" height="400"></canvas>
+<canvas id="myChartDeltas" style="margin-top:50px;border:1px solid black" width="600" height="400"></canvas>
+<canvas id="myChartPeaks" style="margin-top:50px;border:1px solid black" width="600" height="400"></canvas>
+<script>
+    var pending = false;
+    var deltas = [];
+    var milis = [];
+    var lastTime = 0;
+    var d = new Date();
+    var time = d.getTime();
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var ctxDelta = document.getElementById('myChartDeltas').getContext('2d');
+    var ctxPeaks = document.getElementById('myChartPeaks').getContext('2d');
+    var am = 0;
+    var chart = null;
+    var chartDeltas = null;
+    var chartPeaks = null;
+
+    setInterval(function() {
+        time++;
+    }, 1);
+
+    function drawGraph() {
+        console.log('Num of events: ', am);
+        console.log('deltas: ')
+        console.log(deltas);
+        console.log('milis: ');
+        console.log(milis);
+        console.log('-----------------------------------------');
+
+        var data = {
+            labels: milis,
+            datasets: [
+                {
+                    label: "test",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: milis
+                }
+            ]
+        };
+        var dataDelta = {
+            labels: deltas,
+            datasets: [
+                {
+                    label: "test",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: deltas
+                }
+            ]
+        };
+
+        //construct data peaks
+        //peaks is the size of the scroll stops between scrolls
+        var peaks = [];
+        for(var i=0;i<milis.length;i++) {
+            var mili = milis[i];
+            if(mili > 25) {
+                peaks.push(mili);
+            }
+        }
+
+        var dataPeaks = {
+            labels: peaks,
+            datasets: [
+                {
+                    label: "test",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: peaks
+                }
+            ]
+        };
+        if(chart) {
+            chart.destroy();
+            document.getElementById('myChart').width = 600;
+            document.getElementById('myChart').height = 400;
+        }
+        if(chartDeltas) {
+            chartDeltas.destroy();
+            document.getElementById('myChartDeltas').width = 600;
+            document.getElementById('myChartDeltas').height = 400;
+        }
+
+        if(chartPeaks) {
+            chartPeaks.destroy();
+            document.getElementById('myChartPeaks').width = 600;
+            document.getElementById('myChartPeaks').height = 400;
+        }
+        chart = new Chart(ctx).Line(data);
+        chartDeltas = new Chart(ctxDelta).Line(dataDelta);
+        chartPeaks = new Chart(ctxPeaks).Bar(dataPeaks);
+        deltas = [];
+        milis = [];
+        lastTime = 0;
+        am = 0;
+    }
+    document.getElementById("myDIV").addEventListener("wheel", function(e) {
+        am++;
+        var cmilis = time - lastTime;
+        if(lastTime) {
+            milis.push(cmilis);
+        }
+
+        lastTime = time;
+
+        deltas.push(Math.max(e.deltaX, e.deltaY, e.deltaZ));
+    });
+
+</script>
+</body>
+</html>
