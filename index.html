@@ -165,6 +165,252 @@
   </span>
 
   <h2>
+    <a href="/security/2016/03/06/hacking-tachographs-from-the-internets.html">Hacking industrial vehicles from the internet</a>
+  </h2>
+
+  <div>
+    
+    <p>It is possible to <strong>monitor and control float trucks, public bus or delivery vans from the internet</strong>, obtaining their speed, position, and a lot
+other parameters. You can even control some parameters of the vehicle or hack into the canbus of the vehicle remotely.</p>
+
+<p>Those vehicles have a <strong><a href="http://actiaus.com/diagnostics/index.php?option=com_content&amp;view=article&amp;id=49:telematics&amp;catid=3:products&amp;Itemid=3">Telematics Gateway Unit (TGU)</a></strong>
+device and a 3g/4g/gprs/lte/edge/HDSPA modem to connect to the internet, with a public I.P. address.</p>
+
+<p>There are thousands of TGU connected to the internet, with no authentication at all and with administrative interfaces
+through a web panel or a telnet session.</p>
+
+<h3 id="finding-publicly-exposed-tgus-in-the-internets">Finding publicly exposed TGUs in the internets</h3>
+
+<p>There are tons of open TGU and similar vehicle appliances on the internet. One very interesting and easy to find
+is the <strong><a href="http://www.mobile-devices.com/our-products/c4-max-smartbox/">c4max</a></strong>.</p>
+
+<p>The c4max smartbox is a TGU with powerful capabilities, a simple console on port 23, and is easy to identify while scaning the
+internet.</p>
+
+<div style="text-align:center;margin:25px">
+<img src="/assets/media/posts/C4max-365.png" />
+</div>
+
+<p>A quick search with shodan, reveals 733 open c4max devices on the internet, at the time of scanning. Because of the nature of these devices,
+connected to the internet using mobile data plans and in industrial vehicles, the devices you can find vary a lot from time to time.</p>
+
+<p>Scanning the internet yourself with masscan finds different industrial vechicles working at different hours.</p>
+
+<p>The c4max can be found looking for port 23, and the banner ‘gps’ or ‘welcome on console’ or similar strings from the telnet console they provide.</p>
+
+<p>An example with shodan:</p>
+
+<p><strong><a href="https://www.shodan.io/search?query=port%3A23+gps+%22on+console%22">https://www.shodan.io/search?query=port%3A23+gps+%22on+console%22</a></strong></p>
+
+<h3 id="what-can-be-done-inside-a-c4max-tgu">What can be done inside a c4max TGU</h3>
+
+<p>The telnet interface has 3 screns: basic, advanced, and commands.</p>
+
+<p>The basic interface:</p>
+
+<div style="text-align:center;margin:25px">
+<img src="/assets/media/posts/c4max_basics.png" />
+</div>
+
+<p>The advanced interface:</p>
+
+<div style="text-align:center;margin:25px">
+<img src="/assets/media/posts/c4max_advanced.png" />
+</div>
+
+<p>Commands:</p>
+
+<div style="text-align:center;margin:25px">
+<img src="/assets/media/posts/c4max_advanced.png" />
+</div>
+
+<p>Some interesting commands:</p>
+
+<pre><code>Basics[C4E]&gt; iostate
+Input 1 : Disconnected
+Output 1 : Disconnected
+Output 2 : Disconnected
+Alarm : Disconnected
+Ignition : Connected
+Basics[C4E]&gt;
+</code></pre>
+
+<p>Retriving gps coordinates of the vehicle (removed some info from the output, replaced by XXX…):</p>
+
+<pre><code>Basics[C4E]&gt; gpspos
+Internal antenna
+GPRMC Frame value is
+$GPRMC XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+GPGGA Frame value is
+$GPGGA,XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+Basics[C4E]&gt;
+</code></pre>
+
+<p>And with the gps coordinates, we can locate the vehicle in google maps, for example:</p>
+
+<div style="text-align:center;margin:25px">
+<img src="/assets/media/posts/geoloc.png" />
+</div>
+
+<p>List available modules:</p>
+
+<pre><code>Basics[C4E]&gt; list
+dbg
+pdm
+sql
+wdg
+boot
+dhcpServer
+sshTunnel
+serialPPP
+cpnManager
+netMonitoring
+boardsInfo
+messageBrokerProxy
+versionManager
+messageBroker
+config
+dnsProxy
+fileManager
+dictionary
+can
+gps
+ios
+usb
+bootReason
+batt
+leds
+onewire
+wifi
+smartCardManager
+j1587
+j1708
+j1850
+j1939
+kline
+modem
+nvram
+usbHfk
+chronoTachyGraph
+sensors
+dtc
+jvm
+obd
+ibutton
+dataEmitter
+jbinaryGate
+ledManager
+network
+adminProtocol
+crashSensor
+timeZoneManager
+instantFixII
+modemOperatorDriver
+gpsOdometer
+smartSensors
+relayControl
+driverBehavior
+obdStacks
+locales
+fileSync
+pwrManager
+gpsMvtDetector
+geoFencing
+sensorsCalibration
+updateManager
+companionSoftwareClient
+urlServer
+gpsEcho
+binaryGateMonitor
+sensorsRecorder
+messageGate
+binaryGate
+deadReckoning
+speedDropControl
+criticalCommandManager
+cacheManager
+update
+acceleroMvtDetector
+history
+commandManager
+dataRecorder
+eeprom
+Basics[C4E]&gt;
+</code></pre>
+
+<p>The can bus module:</p>
+
+<pre><code>Basics[C4E]&gt; list can
+
+com::mdi::drivers::can.activateDebug=0
+com::mdi::drivers::can.active_protocols=255
+Basics[C4E]&gt;
+</code></pre>
+
+<p>And with listdb, we can get a lot of information from the vehicle, the company that operates the vehicle, the driver etc, that
+I will not post here, for obvious reasons, but some of the information form listdb:</p>
+
+<pre><code>...
+MDI_EXT_BATT_VOLTAGE='12687'
+MDI_GPS_SPEED='0000090'
+...
+</code></pre>
+
+<p>Modem information:</p>
+
+<pre><code>Basics[C4E]&gt; modem
+ppp0	XXXXXXXXXXX
+APN: XXXXXXXXXXX
+autoAPN: XXXXXXXXXXX
+Your IMEI is : XXXXXXXXXXX
+Your IMSI is : XXXXXXXXXXX
+DNS servers are
+nameserver XXXXXXXXXXX
+nameserver XXXXXXXXXXX
+In case of problem, check your configuration (with "list all" command)
+Basics[C4E]&gt;
+</code></pre>
+
+<p>We can even geofence the vehicle (I don’t know what it would cause):</p>
+
+<pre><code>com::mdi::services::geoFencing.periodInMs=5000
+com::mdi::services::geoFencing.directory[0]=/mnt/user/writeDir/geofencing
+com::mdi::services::geoFencing.directory[1]=/mnt/user/data/geofencing
+com::mdi::services::geoFencing.directory[2]=/mnt/user/mmc/geofencing
+com::mdi::services::geoFencing.areaModeSearch=0
+</code></pre>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Telematic Gateway Units exposed to the internet with public addresses and no authentication can be used to remotely track
+industrial vehicles, geofence them, change the mission route, if you read the schematics of these units:</p>
+
+<p><strong><a href="http://www.neweagle.net/ProductDocumentation/Telematics/C4MAX_datasheet.pdf">http://www.neweagle.net/ProductDocumentation/Telematics/C4MAX_datasheet.pdf</a></strong></p>
+
+<p>You can see this device is connected to the bus of the vehicle, to the ignition, to the battery… and the theoretical things that could cause
+are very scary. Of course, not having one of these available and just testing in the wild is not reponsible, so I still don’t know how far
+one can go with access to one of these devices. Caution is advised.</p>
+
+
+    
+  </div>
+
+</article>
+
+
+<article class="home">
+
+  <span class="post-date">
+    
+    March
+    6th,
+    
+    2016
+  </span>
+
+  <h2>
     <a href="/security/2016/03/06/advanced-tor-browser-fingerprinting.html">Advanced Tor Browser Fingerprinting</a>
   </h2>
 
