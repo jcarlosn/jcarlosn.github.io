@@ -173,7 +173,7 @@
     <p>It is possible to <strong>monitor and control float trucks, public bus or delivery vans from the internet</strong>, obtaining their speed, position, and a lot
 other parameters. You can even control some parameters of the vehicle or hack into the canbus of the vehicle remotely.</p>
 
-<p>Those vehicles have a Telematics Gateway Unit (TGU)</strong>
+<p>Those vehicles have a <strong>Telematics Gateway Unit (TGU)</strong>
 device and a 3g/4g/gprs/lte/edge/HDSPA modem to connect to the internet, with a public I.P. address.</p>
 
 <p>There are thousands of TGU connected to the internet, with no authentication at all and with administrative interfaces
@@ -203,6 +203,8 @@ connected to the internet using mobile data plans and in industrial vehicles, th
 <p><strong><a href="https://www.shodan.io/search?query=port%3A23+gps+%22on+console%22">https://www.shodan.io/search?query=port%3A23+gps+%22on+console%22</a></strong></p>
 
 <h3 id="what-can-be-done-inside-a-c4max-tgu">What can be done inside a c4max TGU</h3>
+
+<p><strong>The c4max devices that I found on the internet are not password protected, and there is no security that prevents anyone from connecting to them.</strong></p>
 
 <p>The telnet interface has 3 screns: basic, advanced, and commands.</p>
 
@@ -390,8 +392,14 @@ industrial vehicles, geofence them, change the mission route, if you read the sc
 <p><strong><a href="http://www.neweagle.net/ProductDocumentation/Telematics/C4MAX_datasheet.pdf">http://www.neweagle.net/ProductDocumentation/Telematics/C4MAX_datasheet.pdf</a></strong></p>
 
 <p>You can see this device is connected to the bus of the vehicle, to the ignition, to the battery… and the theoretical things that could cause
-are very scary. Of course, not having one of these available and just testing in the wild is not reponsible, so I still don’t know how far
+are very scary. Of course, not having one of these available and just testing in the wild is not responsible and of course I will not do it, so I still don’t know how far
 one can go with access to one of these devices. Caution is advised.</p>
+
+<p><strong>IMPORTANT NOTE: ALL THE INFORMATION CONTAINED IN THIS POST IS INTENDED FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY. MANIPULATING
+REAL AUTOMOTIVE DEVICES FROM THE INTERNET IS NOT ETHICAL AND COULD BE ILLEGAL UNDER YOUR JURISDICTION.
+ANY VIEWS OR OPINIONS EXPRESSED IN THIS ARTICLE ARE ONLY MY OPINIONS AND NOT RELATED TO MY EMPLOYER OR ANY ORGANIZATION I BELONG TO.
+ALL THE INFORMATION PROVIDED IN THIS POST HAS BEEN COLLECTED USING PUBLICLY AVAILABLE RESOURCES, LIKE MANUFACTURER MANUALS AND SPECIALIZED SEARCH ENGINES.
+THE DEVICES DESCRIBED HERE NEVER HAD ANY KIND OF SECURITY IMPLEMENTED AND THEIR SECURITY WAS NEVER CIRCUMVENTED OR BY PASSED.</strong></p>
 
 
     

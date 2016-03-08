@@ -11,7 +11,7 @@
 				<description>&lt;p&gt;It is possible to &lt;strong&gt;monitor and control float trucks, public bus or delivery vans from the internet&lt;/strong&gt;, obtaining their speed, position, and a lot
 other parameters. You can even control some parameters of the vehicle or hack into the canbus of the vehicle remotely.&lt;/p&gt;
 
-&lt;p&gt;Those vehicles have a &lt;strong&gt;&lt;a href=&quot;http://actiaus.com/diagnostics/index.php?option=com_content&amp;amp;view=article&amp;amp;id=49:telematics&amp;amp;catid=3:products&amp;amp;Itemid=3&quot;&gt;Telematics Gateway Unit (TGU)&lt;/a&gt;&lt;/strong&gt;
+&lt;p&gt;Those vehicles have a &lt;strong&gt;Telematics Gateway Unit (TGU)&lt;/strong&gt;
 device and a 3g/4g/gprs/lte/edge/HDSPA modem to connect to the internet, with a public I.P. address.&lt;/p&gt;
 
 &lt;p&gt;There are thousands of TGU connected to the internet, with no authentication at all and with administrative interfaces
@@ -41,6 +41,8 @@ connected to the internet using mobile data plans and in industrial vehicles, th
 &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://www.shodan.io/search?query=port%3A23+gps+%22on+console%22&quot;&gt;https://www.shodan.io/search?query=port%3A23+gps+%22on+console%22&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;what-can-be-done-inside-a-c4max-tgu&quot;&gt;What can be done inside a c4max TGU&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;The c4max devices that I found on the internet are not password protected, and there is no security that prevents anyone from connecting to them.&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;The telnet interface has 3 screns: basic, advanced, and commands.&lt;/p&gt;
 
@@ -228,8 +230,14 @@ industrial vehicles, geofence them, change the mission route, if you read the sc
 &lt;p&gt;&lt;strong&gt;&lt;a href=&quot;http://www.neweagle.net/ProductDocumentation/Telematics/C4MAX_datasheet.pdf&quot;&gt;http://www.neweagle.net/ProductDocumentation/Telematics/C4MAX_datasheet.pdf&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;You can see this device is connected to the bus of the vehicle, to the ignition, to the battery… and the theoretical things that could cause
-are very scary. Of course, not having one of these available and just testing in the wild is not reponsible, so I still don’t know how far
+are very scary. Of course, not having one of these available and just testing in the wild is not responsible and of course I will not do it, so I still don’t know how far
 one can go with access to one of these devices. Caution is advised.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;IMPORTANT NOTE: ALL THE INFORMATION CONTAINED IN THIS POST IS INTENDED FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY. MANIPULATING
+REAL AUTOMOTIVE DEVICES FROM THE INTERNET IS NOT ETHICAL AND COULD BE ILLEGAL UNDER YOUR JURISDICTION.
+ANY VIEWS OR OPINIONS EXPRESSED IN THIS ARTICLE ARE ONLY MY OPINIONS AND NOT RELATED TO MY EMPLOYER OR ANY ORGANIZATION I BELONG TO.
+ALL THE INFORMATION PROVIDED IN THIS POST HAS BEEN COLLECTED USING PUBLICLY AVAILABLE RESOURCES, LIKE MANUFACTURER MANUALS AND SPECIALIZED SEARCH ENGINES.
+THE DEVICES DESCRIBED HERE NEVER HAD ANY KIND OF SECURITY IMPLEMENTED AND THEIR SECURITY WAS NEVER CIRCUMVENTED OR BY PASSED.&lt;/strong&gt;&lt;/p&gt;
 
 </description>
 				<pubDate>Sun, 06 Mar 2016 00:00:00 +0100</pubDate>
